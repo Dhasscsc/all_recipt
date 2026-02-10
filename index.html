@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>வாடிக்கையாளர் சேவை ஒப்புகை சீட்டு - தாஸ் பொது சேவை மையம்</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #2E7D32, #4CAF50, #81C784);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 35px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .shop-name {
+            color: #2E7D32;
+            font-size: 32px;
+            margin-bottom: 8px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        
+        .accreditation {
+            color: #D32F2F;
+            font-size: 16px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .tagline {
+            color: #666;
+            font-size: 18px;
+            font-weight: 500;
+        }
+        
+        .instructions {
+            background: linear-gradient(to right, #e8f5e9, #f1f8e9);
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 35px;
+            border-left: 5px solid #4CAF50;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+        
+        .instructions h3 {
+            color: #2E7D32;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        
+        .instructions p {
+            margin-bottom: 10px;
+            padding-left: 10px;
+        }
+        
+        .form-section {
+            margin-bottom: 30px;
+            padding-bottom: 25px;
+            border-bottom: 1px dashed #ddd;
+        }
+        
+        .section-title {
+            color: #2E7D32;
+            font-size: 22px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #4CAF50;
+        }
+        
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            flex: 1 1 300px;
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #444;
+            font-size: 17px;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 17px;
+            transition: all 0.3s;
+            background-color: white;
+        }
+        
+        input:focus, select:focus {
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+            outline: none;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 35px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            flex: 1;
+            min-width: 200px;
+            padding: 18px;
+            border: none;
+            border-radius: 8px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .receipt-btn {
+            background: linear-gradient(to right, #4CAF50, #2E7D32);
+            color: white;
+            box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
+        }
+        
+        .receipt-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(76, 175, 80, 0.4);
+        }
+        
+        .pdf-btn {
+            background: linear-gradient(to right, #2196F3, #1976D2);
+            color: white;
+            box-shadow: 0 4px 10px rgba(33, 150, 243, 0.3);
+        }
+        
+        .pdf-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(33, 150, 243, 0.4);
+        }
+        
+        .clear-btn {
+            background: linear-gradient(to right, #f44336, #d32f2f);
+            color: white;
+            box-shadow: 0 4px 10px rgba(244, 67, 54, 0.3);
+        }
+        
+        .clear-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(244, 67, 54, 0.4);
+        }
+        
+        .receipt {
+            display: none;
+            margin-top: 40px;
+            border: 2px solid #31a4f7;
+            padding: 0;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            position: relative;
+            width: 100%;
+        }
+        
+        .receipt-header {
+            background: linear-gradient(to right, hsl(212, 79%, 62%), #31a4f7);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .receipt-shop-name {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .receipt-accreditation {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+        
+        .receipt-address {
+            font-size: 13px;
+            line-height: 1.4;
+            margin-bottom: 3px;
+            color: #e3f2fd;
+        }
+        
+        .receipt-phone {
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+        
+        .receipt-body {
+            padding: 25px;
+        }
+        
+        .receipt-title {
+            text-align: center;
+            font-size: 20px;
+            color: #31a4f7;
+            margin-bottom: 20px;
+            font-weight: 600;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .receipt-title:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 2px;
+            background: #4CAF50;
+        }
+        
+        .receipt-details {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .detail-row {
+            display: flex;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed #ddd;
+            font-size: 15px;
+        }
+        
+        .detail-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .detail-label {
+            flex: 1;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .detail-value {
+            flex: 2;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .amount-row {
+            background-color: #e8f5e9;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .amount-label {
+            font-weight: 700;
+            color: #2E7D32;
+            font-size: 16px;
+        }
+        
+        .amount-value {
+            font-weight: 700;
+            color: #D32F2F;
+            font-size: 18px;
+        }
+        
+        .receipt-footer {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px dashed #ddd;
+            color: #666;
+            font-size: 13px;
+        }
+        
+        .thank-you {
+            font-size: 16px;
+            color: #2E7D32;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .watermark {
+            position: absolute;
+            opacity: 0.05;
+            font-size: 100px;
+            font-weight: bold;
+            color: #2E7D32;
+            transform: rotate(-30deg);
+            top: 35%;
+            left: 15%;
+            pointer-events: none;
+        }
+        
+        .note {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 15px;
+        }
+        
+        .signature-section {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px dashed #ccc;
+        }
+        
+        .signature-line {
+            width: 200px;
+            border-top: 1px solid #333;
+            margin: 5px auto 0;
+        }
+        
+        .signature-label {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 25px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+            }
+            
+            .shop-name {
+                font-size: 26px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .form-group {
+                flex: 1 1 100%;
+            }
+        }
+        
+        .masked-text {
+            letter-spacing: 2px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .service-charge-input {
+            display: flex;
+            align-items: center;
+        }
+        
+        .rupee-symbol {
+            font-size: 20px;
+            font-weight: bold;
+            margin-right: 5px;
+            color: #2E7D32;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="shop-name">தாஸ் பொது சேவை மையம்</div>
+            <div class="accreditation">(மத்திய மாநில அரசு அங்கீகாரம் பெற்றது)</div>
+            <div class="tagline">வாடிக்கையாளர் சேவை ஒப்புகை சீட்டு</div>
+        </div>
+        
+        <div class="instructions">
+            <h3>வழிமுறைகள்:</h3>
+            <p>• வாடிக்கையாளர் விபரங்கள் மற்றும் சேவை விபரங்களை நிரப்பவும்</p>
+            <p>• "ஒப்புகை சீட்டு உருவாக்கு" பொத்தான் கிளிக் செய்யவும்</p>
+            <p>• ஒப்புகை சீட்டு காட்டப்படும்</p>
+            <p>• இரசீது பெற "அச்சிடு" பொத்தான் கிளிக் செய்யவும்</p>
+            <p>• PDF சேமிக்க "PDF சேமிக்க" பொத்தான் கிளிக் செய்யவும்</p>
+        </div>
+        
+        <div class="form-section">
+            <div class="section-title">வாடிக்கையாளர் விபரங்கள்</div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="customerName">வாடிக்கையாளர் பெயர்:</label>
+                    <input type="text" id="customerName" placeholder="முழு பெயரை உள்ளிடவும்">
+                </div>
+                
+                <div class="form-group">
+                    <label for="customerPhone">செல் போன் எண்:</label>
+                    <input type="tel" id="customerPhone" placeholder="10 இலக்க எண்ணை உள்ளிடவும்" maxlength="10">
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="customerEmail">மின்னஞ்சல் (விருப்பத்தேர்வு):</label>
+                    <input type="email" id="customerEmail" placeholder="மின்னஞ்சலை உள்ளிடவும்">
+                </div>
+                
+                <div class="form-group">
+                    <label for="customerAddress">முகவரி (விருப்பத்தேர்வு):</label>
+                    <input type="text" id="customerAddress" placeholder="முகவரியை உள்ளிடவும்">
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <div class="section-title">சேவை விபரங்கள்</div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="serviceType">சேவையின் பெயர்:</label>
+                    <select id="serviceType">
+                        <option value="">சேவையைத் தேர்ந்தெடுக்கவும்</option>
+                        <option value="ஸ்மார்ட் கார்டு விண்ணப்பம்">ஸ்மார்ட் கார்டு விண்ணப்பம்</option>
+                        <option value="ஆதார் கார்டு விண்ணப்பம்">ஆதார் கார்டு விண்ணப்பம் </option>
+                        <option value="பான் கார்டு விண்ணப்பம்">பான் கார்டு விண்ணப்பம் </option>
+                         <option value="வாக்காளர் அட்டை விண்ணப்பம்">வாக்காளர் அட்டை விண்ணப்பம்</option>
+                        <option value="இ சேவை விண்ணப்பம்">இ சேவை விண்ணப்பம்</option>
+                        <option value="பொது சேவை விண்ணப்பம்">பொது சேவை விண்ணப்பம்</option>
+                        <option value="இணைய சேவைகள்">இணைய சேவைகள்</option>
+                        <option value="வங்கி சேவைகள்">வங்கி சேவைகள்</option>
+                        <option value="பட்டா விண்ணப்பம்">பட்டா விண்ணப்பம்</option>
+                        <option value="கட்டணங்கள்">கட்டணங்கள்</option>
+                        <option value="மொபைல் ரீசார்ஜ்">மொபைல் ரீசார்ஜ்</option>
+                        <option value="பிற சேவைகள்">பிற சேவைகள்</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="referenceNumber">குறிப்பு எண்:</label>
+                    <input type="text" id="referenceNumber" placeholder="குறிப்பு/விண்ணப்ப எண்" value="REF-2025-001">
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="serviceCharge">சேவை கட்டணம் (₹):</label>
+                    <div class="service-charge-input">
+                        <span class="rupee-symbol">₹</span>
+                        <input type="number" id="serviceCharge" placeholder="சேவை கட்டணத்தை உள்ளிடவும்" min="0" value="50">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="paymentMode">கட்டண முறை:</label>
+                    <select id="paymentMode">
+                        <option value="பணம்">பணம்</option>
+                        <option value="UPI">UPI</option>
+                        <option value="கிரெடிட்/டெபிட் கார்டு">கிரெடிட்/டெபிட் கார்டு</option>
+                        <option value="நெட் பேங்கிங்">நெட் பேங்கிங்</option>
+                        <option value="காசோலை">காசோலை</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="serviceDescription">சேவை விளக்கம் (விருப்பத்தேர்வு):</label>
+                <input type="text" id="serviceDescription" placeholder="சேவை பற்றிய கூடுதல் விளக்கம்">
+            </div>
+        </div>
+        
+        <div class="button-group">
+            <button class="receipt-btn" onclick="generateReceipt()">
+                <span>🧾</span> ஒப்புகை சீட்டு உருவாக்கு
+            </button>
+            <button class="pdf-btn" onclick="savePDF()">
+                <span>📄</span> PDF சேமிக்க
+            </button>
+            <button class="clear-btn" onclick="clearForm()">
+                <span>🗑️</span> புலங்களை அழி
+            </button>
+        </div>
+        
+        <div class="note">
+            <strong>குறிப்பு:</strong> இந்த ஒப்புகை சீட்டு சேவை பெறுவதற்கான ஆதாரமாகும். சேவை முடிவு வரை இதைப் பாதுகாப்பாக வைத்திருங்கள்.
+        </div>
+        
+        <div id="receipt" class="receipt">
+            <div class="watermark">தாஸ்</div>
+            
+            <div class="receipt-header">
+                <div class="receipt-shop-name">தாஸ் பொது சேவை மையம்</div>
+                <div class="receipt-accreditation">(மத்திய மாநில அரசு அங்கீகாரம் பெற்றது)</div>
+                <div class="receipt-address">147எ, கிரேட் காட்டன் ரோடு,</div>
+                <div class="receipt-address">மத்திய பாகம் காவல் நிலையம் எதிரில்,</div>
+                <div class="receipt-address">தூத்துக்குடி-628001</div>
+                <div class="receipt-phone">செல்: 98 43 23 23 24 / 88 70 23 23 32</div>
+            </div>
+            
+            <div class="receipt-body">
+                <div class="receipt-title">வாடிக்கையாளர் சேவை ஒப்புகை சீட்டு</div>
+                
+                <div class="receipt-details">
+                    <div class="detail-row">
+                        <div class="detail-label">பரிவர்த்தனை எண்:</div>
+                        <div class="detail-value" id="txnId">DHS-20250001</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">தேதி:</div>
+                        <div class="detail-value" id="currentDate"></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">நேரம்:</div>
+                        <div class="detail-value" id="currentTime"></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">வாடிக்கையாளர் பெயர்:</div>
+                        <div class="detail-value" id="receiptCustomerName"></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">செல் போன் எண்:</div>
+                        <div class="detail-value" id="receiptCustomerPhone"></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">சேவையின் பெயர்:</div>
+                        <div class="detail-value" id="receiptServiceType"></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">குறிப்பு எண்:</div>
+                        <div class="detail-value" id="receiptReferenceNumber"></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">கட்டண முறை:</div>
+                        <div class="detail-value" id="receiptPaymentMode"></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">சேவை விளக்கம்:</div>
+                        <div class="detail-value" id="receiptServiceDescription"></div>
+                    </div>
+                    
+                    <div class="detail-row amount-row">
+                        <div class="detail-label amount-label">சேவை கட்டணம்:</div>
+                        <div class="detail-value amount-value" id="receiptServiceCharge"></div>
+                    </div>
+                </div>
+                
+                <div class="signature-section">
+                    <div style="text-align: center;">
+                        <div>_________________________</div>
+                        <div class="signature-label">வாடிக்கையாளர் கையொப்பம்</div>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 20px;">
+                        <div>_________________________</div>
+                        <div class="signature-label">தாஸ் சேவை மைய அதிகாரி</div>
+                    </div>
+                </div>
+                
+                <div class="receipt-footer">
+                    <div class="thank-you">தங்கள் வருகைக்கு நன்றி!</div>
+                    <div>இந்த ஒப்புகை சீட்டு கணினி மூலம் உருவாக்கப்பட்டது</div>
+                    <div>மேல்முறையீடு: 9843232324 / 8870232332</div>
+                    <div>வலைத்தளம்: https://dhasscsc.github.io/online_service/</div>
+                    <div style="margin-top: 10px; font-style: italic; color: #777;">
+                        <small>இந்த ஒப்புகை சீட்டை சேவை நிறைவு பெறும் வரை பாதுகாப்பாக வைத்திருங்கள்</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function updateDateTime() {
+            const now = new Date();
+            const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+            const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
+            
+            const date = now.toLocaleDateString('ta-IN', dateOptions);
+            const time = now.toLocaleTimeString('ta-IN', timeOptions);
+            
+            document.getElementById('currentDate').textContent = date;
+            document.getElementById('currentTime').textContent = time;
+            
+            const txnId = 'DHS-' + now.getFullYear() + 
+                         String(now.getMonth() + 1).padStart(2, '0') +
+                         String(now.getDate()).padStart(2, '0') +
+                         String(now.getHours()).padStart(2, '0') +
+                         String(now.getMinutes()).padStart(2, '0') +
+                         String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('txnId').textContent = txnId;
+        }
+        
+        function validatePhone(phone) {
+            const phoneRegex = /^[6-9]\d{9}$/;
+            return phoneRegex.test(phone);
+        }
+        
+        function generateReceipt() {
+            const customerName = document.getElementById('customerName').value.trim();
+            const customerPhone = document.getElementById('customerPhone').value.trim();
+            const serviceType = document.getElementById('serviceType').value;
+            const referenceNumber = document.getElementById('referenceNumber').value.trim();
+            const serviceCharge = document.getElementById('serviceCharge').value.trim();
+            const paymentMode = document.getElementById('paymentMode').value;
+            const serviceDescription = document.getElementById('serviceDescription').value.trim();
+            
+            if (!customerName || !customerPhone || !serviceType || !referenceNumber || !serviceCharge) {
+                alert('தயவு செய்து அனைத்து கட்டாய புலங்களையும் நிரப்பவும்');
+                return;
+            }
+            
+            if (!validatePhone(customerPhone)) {
+                alert('செல்லுபடியாகும் 10 இலக்க செல் போன் எண்ணை உள்ளிடவும்');
+                return;
+            }
+            
+            if (isNaN(serviceCharge) || parseFloat(serviceCharge) <= 0) {
+                alert('சரியான சேவை கட்டணத்தை உள்ளிடவும்');
+                return;
+            }
+            
+            const receiptCustomerName = document.getElementById('receiptCustomerName');
+            const receiptCustomerPhone = document.getElementById('receiptCustomerPhone');
+            const receiptServiceType = document.getElementById('receiptServiceType');
+            const receiptReferenceNumber = document.getElementById('receiptReferenceNumber');
+            const receiptServiceCharge = document.getElementById('receiptServiceCharge');
+            const receiptPaymentMode = document.getElementById('receiptPaymentMode');
+            const receiptServiceDescription = document.getElementById('receiptServiceDescription');
+            
+            receiptCustomerName.textContent = customerName;
+            
+            const formattedPhone = customerPhone.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
+            receiptCustomerPhone.textContent = formattedPhone;
+            
+            receiptServiceType.textContent = serviceType;
+            receiptReferenceNumber.textContent = referenceNumber;
+            receiptServiceCharge.textContent = '₹' + parseFloat(serviceCharge).toFixed(2);
+            receiptPaymentMode.textContent = paymentMode;
+            receiptServiceDescription.textContent = serviceDescription || 'விளக்கம் இல்லை';
+            
+            updateDateTime();
+            document.getElementById('receipt').style.display = 'block';
+            document.getElementById('receipt').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function savePDF() {
+            const receiptElement = document.getElementById('receipt');
+            if (receiptElement.style.display === 'none') {
+                alert('முதலில் ஒப்புகை சீட்டை உருவாக்கவும்');
+                return;
+            }
+            
+            html2canvas(receiptElement, {
+                scale: 2,
+                useCORS: true,
+                allowTaint: true
+            }).then(canvas => {
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a5');
+                
+                const imgData = canvas.toDataURL('image/png');
+                const imgWidth = 148;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                
+                pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+                
+                const fileName = `Service-Receipt-${new Date().getTime()}.pdf`;
+                pdf.save(fileName);
+            }).catch(err => {
+                console.error('PDF உருவாக்கல் பிழை:', err);
+                alert('PDF உருவாக்கல் பிழை ஏற்பட்டது. தயவு செய்து மீண்டும் முயற்சி செய்யவும்.');
+            });
+        }
+        
+        function clearForm() {
+            document.getElementById('customerName').value = '';
+            document.getElementById('customerPhone').value = '';
+            document.getElementById('customerEmail').value = '';
+            document.getElementById('customerAddress').value = '';
+            document.getElementById('serviceType').value = '';
+            document.getElementById('referenceNumber').value = 'REF-2025-001';
+            document.getElementById('serviceCharge').value = '50';
+            document.getElementById('paymentMode').value = 'பணம்';
+            document.getElementById('serviceDescription').value = '';
+            document.getElementById('receipt').style.display = 'none';
+            
+            alert('அனைத்து புலங்களும் அழிக்கப்பட்டன');
+        }
+        
+        function printReceipt() {
+            const receiptElement = document.getElementById('receipt');
+            if (receiptElement.style.display === 'none') {
+                alert('முதலில் ஒப்புகை சீட்டை உருவாக்கவும்');
+                return;
+            }
+            
+            const originalContent = document.body.innerHTML;
+            const receiptContent = receiptElement.innerHTML;
+            
+            document.body.innerHTML = receiptContent;
+            window.print();
+            document.body.innerHTML = originalContent;
+            document.getElementById('receipt').style.display = 'block';
+        }
+        
+        window.onload = function() {
+            updateDateTime();
+            
+            document.getElementById('customerPhone').addEventListener('input', function(e) {
+                this.value = this.value.replace(/\D/g, '');
+                if (this.value.length > 10) {
+                    this.value = this.value.substring(0, 10);
+                }
+            });
+            
+            document.getElementById('serviceCharge').addEventListener('input', function(e) {
+                if (this.value < 0) {
+                    this.value = 0;
+                }
+            });
+            
+            document.getElementById('customerName').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    generateReceipt();
+                }
+            });
+            
+            document.getElementById('customerPhone').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    generateReceipt();
+                }
+            });
+            
+            window.addEventListener('afterprint', function() {
+                document.getElementById('receipt').style.display = 'none';
+            });
+            
+            const now = new Date();
+            const referenceNumber = 'REF-' + now.getFullYear() + '-' + 
+                                   String(now.getMonth() + 1).padStart(2, '0') + 
+                                   String(now.getDate()).padStart(2, '0') + 
+                                   String(Math.floor(Math.random() * 100)).padStart(2, '0');
+            document.getElementById('referenceNumber').value = referenceNumber;
+        };
+    </script>
+</body>
+</html>
